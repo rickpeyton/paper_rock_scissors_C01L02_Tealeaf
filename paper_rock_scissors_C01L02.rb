@@ -2,7 +2,6 @@
 # Tealeaf Academy C01L02
 
 class RockPaperScissors
-
   def initialize
     to_s
     play
@@ -19,11 +18,11 @@ class RockPaperScissors
         choice = gets.chomp.upcase
       end until 'PRS'.include?(choice)
       player = Player.new(choice)
-      computer = Player.new(['P','R','S'].sample)
-      puts "Player plays #{player.translate} and Computer plays " +
-           "#{computer.translate}"
+      computer = Player.new(%w(P R S).sample)
+      puts "Player plays #{player.translate} and Computer plays " \
+        "#{computer.translate}"
       Winner.new(player.choice, computer.choice).declare
-      puts "Do you want to play again? (Y/N)"
+      puts 'Do you want to play again? (Y/N)'
       play_again = gets.chomp.upcase
       system 'clear' if play_again == 'Y'
     end until play_again == 'N'
