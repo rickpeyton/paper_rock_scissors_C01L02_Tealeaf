@@ -1,9 +1,14 @@
 # Object Oriented Paper Rock Scissors
 # Tealeaf Academy C01L02
+require 'pry'
 
 class RockPaperScissors
+  attr_accessor :player, :computer
+
   def initialize
     to_s
+    @player = Player.new
+    @computer = Player.new
     play
   end
 
@@ -16,43 +21,56 @@ class RockPaperScissors
       begin
         puts 'Choose one: (P/R/S)'
         choice = gets.chomp.upcase
-      end until 'PRS'.include?(choice)
-      player = Player.new(choice)
-      computer = Player.new(%w(P R S).sample)
+      end until Plays::CHOICES.keys.include?(choice)
+      self.player.choice = choice
+      self.computer.choice = Plays::CHOICES.keys.sample
       puts "Player plays #{player.translate} and Computer plays " \
         "#{computer.translate}"
-      Winner.new(player.choice, computer.choice).declare
+      pick_winner
       puts 'Do you want to play again? (Y/N)'
       play_again = gets.chomp.upcase
       system 'clear' if play_again == 'Y'
     end until play_again == 'N'
   end
-end
 
-class Winner
-  def initialize(user_choice, computer_choice)
-    @user_choice = user_choice
-    @computer_choice = computer_choice
+  def pick_winner
+    if player == computer
+      puts "It's a tie!"
+    elsif player > computer
+      display_victory_message(player.choice)
+      puts "You win!"
+    else
+      display_victory_message(computer.choice)
+      puts "Computer wins!"
+    end
   end
 
-  def declare
-    if @user_choice == @computer_choice
-      puts 'It is a tie!'
-    elsif (@user_choice == 'R' && @computer_choice == 'S') ||
-          (@user_choice == 'S' && @computer_choice == 'P') ||
-          (@user_choice == 'P' && @computer_choice == 'R')
-      puts 'Player wins!'
-    else
-      puts 'The computer wins!'
+  def display_victory_message(winning_choice)
+    case winning_choice
+    when 'R'
+      puts 'The rock beats scissors'
+    when 'S'
+      puts 'The scissors beat paper'
+    when 'P'
+      puts 'The paper beats rock'
     end
   end
 end
 
 class Player
+  include Comparable
   attr_accessor :choice
 
-  def initialize(choice)
-    @choice = choice
+  def <=>(computer)
+    if self.choice == computer.choice
+      0
+    elsif (self.choice == 'P' && computer.choice == 'R') ||
+          (self.choice == 'R' && computer.choice == 'S') ||
+          (self.choice == 'S' && computer.choice == 'P')
+      1
+    else
+      -1
+    end
   end
 
   def translate
@@ -61,15 +79,13 @@ class Player
 end
 
 class Plays
-  def initialize
-    @options =
-      { 'P' => 'Paper',
-        'R' => 'Rock',
-        'S' => 'Scissors' }
-  end
+  CHOICES =
+    { 'P' => 'Paper',
+      'R' => 'Rock',
+      'S' => 'Scissors' }
 
   def letter_to_word(letter)
-    @options[letter]
+    CHOICES[letter]
   end
 end
 
